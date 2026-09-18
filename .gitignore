@@ -1,0 +1,43 @@
+# This repository publishes an independent review only.
+# Sahne Plus is proprietary software; its source, binaries and documents are
+# deliberately NOT redistributed here. These rules exist so an accidental
+# `git add -A` cannot commit them.
+
+# Extracted application source
+Source/
+app-1.2.0/
+app-1.1.1/
+asar-1.2.0/
+asar-1.1.1/
+*.asar
+
+# Binaries and installers
+*.exe
+*.dll
+*.msi
+*.7z
+*.zip
+Binaries/
+nsis-1.2.0/
+nsis-1.1.1/
+unpacked-app-*/
+
+# Upstream documentation, linked rather than mirrored
+CHANGELOG.md
+PRIVACY.md
+SECURITY.md
+TERMS.md
+THIRD_PARTY_NOTICES.md
+LICENSE.txt
+
+# Bundled third-party assets
+*.woff2
+*.ttf
+*.pak
+*.dat
+*.bin
+
+# Local scratch
+_probe/
+*.log
+.env

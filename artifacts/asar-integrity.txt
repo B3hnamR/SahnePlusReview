@@ -1,0 +1,94 @@
+SAHNE PLUS — ASAR INTEGRITY VERIFICATION
+========================================
+Review date: 2026-09-18
+
+PURPOSE
+-------
+
+When the Electron fuse `EnableEmbeddedAsarIntegrityValidation` is enabled, the
+runtime validates the application archive against a hash embedded in the
+executable before loading it, and aborts startup if the values differ. This
+prevents silently modifying a packaged application's code.
+
+This document records the verification that the embedded hash and the shipped
+archive actually agree. It is not sufficient to read the fuse value — the
+question is whether the recorded hash matches the artifact.
+
+Verification was performed for both releases to confirm the mechanism is used
+consistently and not only in the newest build.
+
+
+WHERE THE HASH LIVES
+--------------------
+
+Electron stores the record in the executable's PE resource directory:
+
+  INTEGRITY > ELECTRONASAR > #1033
+
+Contents (UTF-8 JSON):
+
+  [{"file":"resources\\app.asar","alg":"SHA256","value":"<hash>"}]
+
+This resource is not present as a plain string in the binary — it is stored in
+the PE resource section and must be parsed out. See
+tools/verify-asar-integrity.py.
+
+
+WHAT IS HASHED
+--------------
+
+The hash covers the ASAR header JSON (the archive's file index), not the whole
+file. The ASAR format is:
+
+  offset 0   uint32  pickle header size
+  offset 4   uint32  header size
+  offset 8   uint32  header string size
+  offset 12  uint32  json size
+  offset 16  ...     header JSON
+
+The validated scope is the header JSON beginning at offset 16. An initial
+verification attempt hashed the entire file and reported a mismatch; that was a
+reviewer error in determining the scope, not a discrepancy in the artifact. The
+corrected comparison is below.
+
+
+RESULT — version 1.2.0
+----------------------
+
+  embedded in executable   5b1adda8f779dfb0ea2bbbc7391d48c188372f161050b258eba3ba1fb04b17cc
+  measured from app.asar   5b1adda8f779dfb0ea2bbbc7391d48c188372f161050b258eba3ba1fb04b17cc
+  result                   MATCH
+
+  app.asar size            1,595,988 bytes
+  header size              7,588 bytes
+  header JSON size         7,578 bytes
+
+
+RESULT — version 1.1.1
+----------------------
+
+  embedded in executable   5ed707921dc7f1037bf77efe75d36bc9dff9025ccb2619aba902e50d4dd001ea
+  measured from app.asar   5ed707921dc7f1037bf77efe75d36bc9dff9025ccb2619aba902e50d4dd001ea
+  result                   MATCH
+
+  app.asar size            1,593,679 bytes
+  header size              7,588 bytes
+  header JSON size         7,578 bytes
+
+
+INTERPRETATION
+--------------
+
+Both releases carry a correct, matching integrity record, and the fuse that
+enforces it is enabled. The application archive cannot be modified in place
+without causing startup to fail.
+
+This is a meaningful hardening measure and is not present in all Electron
+applications.
+
+SCOPE NOTE
+----------
+
+This validates that the shipped archive matches the hash recorded alongside it
+in the same executable. It does not establish who built the executable, since
+the executable is unsigned. It confirms internal consistency, not provenance.

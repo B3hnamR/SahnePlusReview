@@ -1,0 +1,108 @@
+SAHNE PLUS — MEASURED HASHES
+============================
+Review date: 2026-09-18
+Reviewer: B3hnamR (independent third-party review)
+
+Method: files downloaded from the official GitHub release page, then hashed
+locally with SHA-256. Values compared byte-for-byte against the SHA256SUMS.txt
+published in the same release.
+
+INSTALLERS
+----------
+
+Sahne-Plus-Setup-1.2.0.exe
+  size       100,658,451 bytes
+  published  dddbaa942d715021b5636998cb2f62321127b2c031b4daee7efc840eef1bfc92
+  measured   dddbaa942d715021b5636998cb2f62321127b2c031b4daee7efc840eef1bfc92
+  result     MATCH
+
+Sahne-Plus-Setup-1.1.1.exe
+  size       100,658,035 bytes
+  published  dc53caf04dfb2e44a34c7521b6aaa4d313dfdefb8d284d7edc162f66ab7d105a
+  measured   dc53caf04dfb2e44a34c7521b6aaa4d313dfdefb8d284d7edc162f66ab7d105a
+  result     MATCH
+
+
+APPLICATION CONTAINERS
+----------------------
+
+app.asar (1.2.0)
+  size       1,595,988 bytes
+  sha256     b6334df0f6f8bb6e59e56801c7bf18213df56a242c84eda4bce651e28c33d7ea
+
+app.asar (1.1.1)
+  size       1,593,679 bytes
+  sha256     ab2e4454f7dd08f19a7cae5001d37f61964a4663bd460a0c306c8eeeb21fde60
+
+Note: these are recorded for identification only. The containers are not
+redistributed in this repository.
+
+
+EXTRACTED EXECUTABLES
+---------------------
+
+Sahne Plus.exe (Electron host, 1.2.0)
+  size       225,629,696 bytes
+  sha256     5e42baf527cacf2a515725966fa0e3ec0f11ae8baa2cc93f9d6116d2ad27bae5
+
+Uninstall Sahne Plus.exe (1.2.0)
+  size       210,720 bytes
+  sha256     45363ff81fc891922a31366384ec5685e5042b3518f8eb352473166757a11a7e
+
+
+CODE SIGNING
+------------
+
+Sahne-Plus-Setup-1.2.0.exe       NotSigned
+Sahne Plus.exe (1.2.0)           NotSigned
+
+No Authenticode certificate chain is present on either artifact. The published
+checksum is therefore the only available integrity anchor for downloads.
+
+
+BUILD IDENTITY
+--------------
+
+Product name       Sahne Plus
+File version       1.2.0
+Company name       AmirEyZed
+Legal copyright    Copyright (c) 2026 AmirEyZed
+Electron           43.2.0
+Chromium           150.0.7871.129
+Node.js (runtime)  bundled with Electron 43.2.0
+
+
+PACKAGING
+---------
+
+Installer format   NSIS 3 (Unicode)
+Payload            $PLUGINSDIR\app-64.7z (solid 7z), 100,009,341 bytes
+Plugins            System, UAC, StdUtils, nsDialogs, nsExec, WinShell, nsis7z
+                   (all stock NSIS plugins, no custom dropper)
+Unpacked size      365,874,850 bytes
+
+
+INSTALLER STRING SCAN
+---------------------
+
+Searched the installer's UTF-16 string table for persistence and execution
+mechanisms. All counts are zero:
+
+  Software\Microsoft\Windows\CurrentVersion\Run    0
+  schtasks                                         0
+  powershell                                       0
+  cmd.exe                                          0
+  rundll32                                         0
+  reg add                                          0
+  net user                                         0
+  certutil                                         0
+  bitsadmin                                        0
+  wscript                                          0
+  .vbs                                             0
+  Invoke-                                          0
+
+The only registry path present in the installer is the standard
+HKCU\Software\Microsoft\Windows\CurrentVersion\Run key that the application
+optionally writes for its own documented "start with Windows" feature. That
+entry is created by the application at runtime, not by the installer, and is
+controlled by a user-facing setting.

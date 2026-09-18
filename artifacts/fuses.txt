@@ -1,0 +1,75 @@
+SAHNE PLUS — ELECTRON FUSE CONFIGURATION
+========================================
+Review date: 2026-09-18
+
+Source: read directly from the shipped executable, not from documentation.
+Command:
+
+  npx @electron/fuses read --app "Sahne Plus.exe"
+
+
+RESULT — version 1.2.0
+----------------------
+
+Analyzing app: Sahne Plus.exe
+Fuse Version: v1
+  RunAsNode                                Disabled
+  EnableCookieEncryption                   Enabled
+  EnableNodeOptionsEnvironmentVariable     Disabled
+  EnableNodeCliInspectArguments            Disabled
+  EnableEmbeddedAsarIntegrityValidation    Enabled
+  OnlyLoadAppFromAsar                      Enabled
+  LoadBrowserProcessSpecificV8Snapshot     Disabled
+  GrantFileProtocolExtraPrivileges         Disabled
+  WasmTrapHandlers                         Enabled
+
+
+INTERPRETATION
+--------------
+
+These are the correct settings for a production Electron build.
+
+The three most security-relevant fuses are all disabled:
+
+  RunAsNode
+      When enabled, the packaged executable can be launched as a generic Node.js
+      interpreter, which allows arbitrary JavaScript to be executed in the
+      application's context. Disabled here.
+
+  EnableNodeOptionsEnvironmentVariable
+      When enabled, the NODE_OPTIONS environment variable is honoured, allowing
+      an attacker who can set environment variables to inject code (for example
+      --require) into the Electron process. Disabled here.
+
+  EnableNodeCliInspectArguments
+      When enabled, --inspect and --inspect-brk are honoured, exposing a
+      debugger that permits arbitrary code execution in the process. Disabled
+      here.
+
+Together these close the three standard trivial routes from "can set an
+environment variable or command-line argument" to "arbitrary native code
+execution" in an Electron application.
+
+Two fuses are enabled and provide additional integrity guarantees:
+
+  EnableEmbeddedAsarIntegrityValidation
+      Electron validates a hash of the application archive header against a
+      value embedded in the executable's PE resources at startup, and aborts if
+      they differ. Verified separately — see artifacts/asar-integrity.txt.
+
+  OnlyLoadAppFromAsar
+      Prevents loading application code from a sibling directory such as
+      app/ next to app.asar, which is a known technique for replacing a
+      packaged application's code without modifying the archive.
+
+  GrantFileProtocolExtraPrivileges is Disabled, which removes the extended
+  privileges historically granted to file:// origins.
+
+
+CAVEAT
+------
+
+Fuse configuration governs how the Electron runtime loads and protects the
+application. It says nothing about the security of the bundled Chromium and V8
+machine code, which was not audited in this review. See the scope statement in
+the top-level README.
